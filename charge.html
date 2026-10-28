@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>打工人薪情监测器</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101114;
+      --panel: #191a20;
+      --panel2: #202127;
+      --line: #34353d;
+      --text: #f2f2f4;
+      --muted: #a1a2ad;
+      --green: #b8ff65;
+      --red: #ff7777;
+      --yellow: #ffd36b
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 20% -10%, #2b2b32 0, transparent 45%), var(--bg);
+      color: var(--text);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: auto;
+      padding: 28px 18px 48px
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--green);
+      font-weight: 800
+    }
+
+    .title {
+      font-size: clamp(25px, 4vw, 38px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin: 5px 0
+    }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 650px
+    }
+
+    .tag {
+      border: 1px solid #51525a;
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: #c9c9d0;
+      white-space: nowrap;
+      font-size: 12px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px
+    }
+
+    .panel {
+      background: linear-gradient(145deg, #1d1e24, #17181d);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 12px 35px #0002
+    }
+
+    .panel h2 {
+      font-size: 15px;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400
+    }
+
+    .hero {
+      grid-column: 1/-1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      min-height: 190px
+    }
+
+    .hero-label {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .income {
+      font-size: clamp(38px, 7vw, 68px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: var(--green);
+      line-height: 1.2;
+      margin: 7px 0
+    }
+
+    .hero-countdown {
+      font-size: clamp(28px, 5.5vw, 54px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: var(--green);
+      line-height: 1.2;
+      margin: 7px 0
+    }
+
+    .income.blurred {
+      filter: blur(12px);
+      user-select: none
+    }
+
+    .money.blurred {
+      filter: blur(9px);
+      user-select: none
+    }
+
+    .private-value.blurred {
+      filter: blur(8px);
+      user-select: none
+    }
+
+    .hero-note {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      border: 1px solid #494a54;
+      background: #272830;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 13px;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .btn:hover {
+      border-color: #8d8e98
+    }
+
+    .btn.primary {
+      background: var(--green);
+      border-color: var(--green);
+      color: #171910
+    }
+
+    .btn.small {
+      font-size: 12px;
+      padding: 7px 10px
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #26272e;
+      color: #d5d5dc;
+      font-size: 12px
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      display: inline-block
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px
+    }
+
+    .metric .v {
+      white-space: nowrap;
+      font-size: clamp(14px, 2vw, 24px);
+      letter-spacing: -.4px
+    }
+
+    .metric {
+      overflow: hidden
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--panel2);
+      border: 1px solid #2e2f37;
+      min-width: 0
+    }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .metric .v {
+      font-size: clamp(17px, 2.2vw, 24px);
+      font-weight: 800;
+      margin-top: 6px;
+      overflow-wrap: anywhere
+    }
+
+    .metric .unit {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500
+    }
+
+    .section {
+      margin-top: 16px
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0
+    }
+
+    .field.full {
+      grid-column: 1/-1
+    }
+
+    .field label {
+      font-size: 12px;
+      color: #c8c8d0
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-width: 0;
+      background: #111217;
+      border: 1px solid #3a3b45;
+      color: var(--text);
+      border-radius: 9px;
+      padding: 10px 11px;
+      font: inherit;
+      outline: none
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--green)
+    }
+
+    .field small {
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    .radios {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .radio {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #3a3b45;
+      border-radius: 9px;
+      padding: 9px 10px;
+      background: #111217;
+      cursor: pointer
+    }
+
+    .radio input {
+      accent-color: var(--green)
+    }
+
+    .section-title {
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 800;
+      letter-spacing: .8px;
+      margin: 18px 0 10px
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .progress-wrap {
+      margin-top: 15px
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 7px
+    }
+
+    .progress {
+      height: 8px;
+      background: #303139;
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: var(--green);
+      border-radius: 99px;
+      transition: width .3s
+    }
+
+    .quote {
+      border-left: 2px solid var(--yellow);
+      padding: 10px 12px;
+      background: #26231c;
+      color: #e9d9ac;
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      margin-top: 16px
+    }
+
+    .footer {
+      color: #777985;
+      font-size: 11px;
+      margin-top: 17px;
+      line-height: 1.7
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #eee;
+      color: #111;
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px #0005;
+      display: none;
+      z-index: 5
+    }
+
+    .privacy {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px
+    }
+
+    .danger {
+      color: var(--yellow)
+    }
+
+    @media(max-width:760px) {
+      .wrap {
+        padding: 18px 12px 30px
+      }
+
+      .grid {
+        grid-template-columns: minmax(0, 1fr)
+      }
+
+      .hero {
+        grid-column: auto;
+        grid-template-columns: 1fr
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .top {
+        align-items: flex-start
+      }
+
+      .tag {
+        display: none
+      }
+
+      .panel {
+        padding: 16px
+      }
+
+      .income {
+        font-size: 48px
+      }
+    }
+
+    @media(max-width:400px) {
+      .fields {
+        grid-template-columns: 1fr
+      }
+
+      .field.full {
+        grid-column: auto
+      }
+
+      .actions .btn {
+        flex: 1
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <div class="eyebrow">WORKER VALUE OBSERVATION DEPARTMENT</div>
+        <div class="title">打工人薪情监测器<span style="color:var(--green)">.</span></div>
+        <div class="subtitle">把人生切成秒，再把秒折算成人民币。至少在数字上，你的时间没有白过。</div>
+      </div>
+      <div class="tag">本地运行 · 不上传工资</div>
+    </header>
+    <main class="grid">
+      <section class="panel hero">
+        <div>
+          <div class="hero-label"><span id="heroLabel">今日已兑现的劳动价值</span> <span id="todayDate"></span></div>
+          <div class="income" id="liveIncome">¥ 0.0000</div>
+          <div class="hero-countdown hidden" id="heroCountdown">--</div>
+          <div class="hero-note" id="incomeCaption">正在核算你把生命兑换成工资的进度……</div>
+          <div class="progress-wrap">
+            <div class="progress-head"><span id="progressLabel">今日工作进度</span><span id="progressPct">0%</span></div>
+            <div class="progress">
+              <div class="bar" id="progressBar"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="actions"><button class="btn primary" id="togglePrivacy">◉ 隐藏金额</button><button class="btn"
+              id="refreshBtn">↻ 刷新计算</button></div>
+          <div style="margin-top:12px"><span class="status"><i class="dot" id="statusDot"></i><span
+                id="workStatus">正在确认是否需要上班</span></span></div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>劳动价值换算表 <span class="hint">税后口径</span></h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">日薪估算</div>
+            <div class="v money" id="dailyPay">¥ 0</div>
+          </div>
+          <div class="metric">
+            <div class="k">时薪估算</div>
+            <div class="v money" id="hourlyPay">¥ 0</div>
+          </div>
+          <div class="metric">
+            <div class="k">每秒价值</div>
+            <div class="v money" id="secondPay">¥ 0</div>
+          </div>
+          <div class="metric">
+            <div class="k">本月累计</div>
+            <div class="v money" id="monthPay">¥ 0</div>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">已工作</div>
+            <div class="v" id="workedTime">--</div>
+          </div>
+          <div class="metric">
+            <div class="k">距离下班</div>
+            <div class="v" id="leftTime">--</div>
+          </div>
+          <div class="metric">
+            <div class="k">本月工作日</div>
+            <div class="v" id="workdayCount">--</div>
+          </div>
+          <div class="metric">
+            <div class="k">今日有效工时</div>
+            <div class="v" id="hoursToday">--</div>
+          </div>
+        </div>
+        <div class="quote" id="quote">今日寄语：努力不一定有回报，但打卡记录会留下证据。</div>
+      </section>
+      <section class="panel">
+        <h2>配置你的劳动合同（精神版） <span class="hint">修改后自动保存到本机</span></h2>
+        <div class="section-title">01 / 工资口径</div>
+        <div class="fields">
+          <div class="field"><label for="salary">月薪（元）</label><input id="salary" class="private-value" type="number"
+              min="0" step="100" value="15000"></div>
+          <div class="field"><label>你填的是</label>
+            <div class="radios"><label class="radio"><input type="radio" name="salaryType" value="gross" checked>
+                税前</label><label class="radio"><input type="radio" name="salaryType" value="net"> 到手</label></div>
+          </div>
+          <div class="field" id="deductionField"><label for="deduction">五险一金及个税估算扣除比例（%）</label><input id="deduction"
+              class="private-value" type="number" min="0" max="80" step="1"
+              value="20"><small>仅用于估算；有实际到手工资可直接填写下方。</small></div>
+          <div class="field"><label for="actualNet">实际到手月薪（可选，优先使用）</label><input id="actualNet" class="private-value"
+              type="number" min="0" step="100" placeholder="不知道可留空"></div>
+        </div>
+        <div class="section-title">02 / 上班时间与休息</div>
+        <div class="fields">
+          <div class="field"><label for="start">上班时间</label><input id="start" type="time" value="09:00"></div>
+          <div class="field"><label for="end">下班时间</label><input id="end" type="time" value="18:00"></div>
+          <div class="field"><label for="lunchStart">午休开始</label><input id="lunchStart" type="time" value="12:00"></div>
+          <div class="field"><label for="lunchEnd">午休结束</label><input id="lunchEnd" type="time" value="13:00"></div>
+          <div class="field full"><label>常规工作安排</label>
+            <div class="radios"><label class="radio"><input type="radio" name="schedule" value="5" checked> 周一至周五 /
+                双休</label><label class="radio"><input type="radio" name="schedule" value="6"> 周一至周六 / 单休</label><label
+                class="radio"><input type="radio" name="schedule" value="7"> 每周七天（自定义）</label></div>
+          </div>
+          <div class="field"><label for="holidayMode">中国节假日处理</label><select id="holidayMode">
+              <option value="official">使用内置官方日历（2026）</option>
+              <option value="weekend">只按常规周末判断</option>
+              <option value="manual">手动指定补班/休息日期</option>
+            </select><small>官方节假日会覆盖常规周末规则。</small></div>
+          <div class="field"><label for="manualWork">额外补班日期</label><input id="manualWork"
+              placeholder="例如 2026-10-10,2026-10-11"><small>逗号分隔，格式 YYYY-MM-DD。</small></div>
+          <div class="field full"><label for="manualRest">额外休息日期 / 假期日期</label><input id="manualRest"
+              placeholder="例如 2026-10-01,2026-10-02"><small>逗号分隔；优先级高于补班日期。法定节假日的加班费不在本工具估算范围内。</small></div>
+        </div>
+        <div class="section-title">03 / 显示偏好</div>
+        <div class="fields">
+          <div class="field"><label for="heroFocus">首页重点展示</label><select id="heroFocus">
+              <option value="income">实时收入</option>
+              <option value="countdown">下班倒计时</option>
+            </select><small>切换首页最醒目的大号指标。</small></div>
+          <div class="field"><label for="privacyDefault">金额默认显示方式</label><select id="privacyDefault">
+              <option value="visible">显示金额</option>
+              <option value="hidden" selected>隐藏金额（摸鱼防窥）</option>
+            </select></div>
+          <div class="field"><label for="rounding">金额精度</label><select id="rounding">
+              <option value="2">保留 2 位小数</option>
+              <option value="4" selected>保留 4 位小数</option>
+              <option value="0">取整</option>
+            </select></div>
+        </div>
+        <div class="actions" style="margin-top:18px"><button class="btn primary" id="saveBtn">保存设置并重新计算</button><button
+            class="btn" id="resetBtn">恢复默认设置</button></div>
+        <div class="privacy">🔒 设置和工资仅保存在当前浏览器的本地存储中，不会发送到服务器。公共电脑请关闭页面并清除浏览器数据。</div>
+      </section>
+      <section class="panel">
+        <h2>计算规则说明</h2>
+        <div style="color:#c4c4cc;font-size:13px;line-height:1.8">
+          <p>• <b>日薪</b> = 估算到手月薪 ÷ 当月计薪工作日。</p>
+          <p>• <b>时薪</b> = 到手月薪 ÷ 当月计薪工作日 ÷ 每日有效工作小时。</p>
+          <p>• <b>今日收入</b> = 时薪 × 今日已完成的有效工作时间，午休不计入。</p>
+          <p>• <b>月累计</b> = 本月已完成工作日的估算收入，不代表工资单实发数。</p>
+          <p>• 补班日会按工作日计入；法定休假日默认不计入正常工作收益。不同劳动合同、计薪制度和加班安排可能不同。</p>
+        </div>
+        <div class="quote"><span class="danger">重要：</span>这是个人时间与收入的估算器，不是工资、个税或加班费的法律计算工具。税前工资扣除比例只是粗略估算。</div>
+        <div class="footer">如果今天不是工作日，系统会诚实地显示“今日无需出卖时间”。如果今天是补班日，它也不会替你假装没看见。</div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    (function () {
+      const $ = id => document.getElementById(id);
+      const STORAGE = 'workerValueMonitorSettingsV1';
+      const quotes = [
+        '努力不一定有回报，但打卡记录会留下证据。',
+        '你不是在浪费生命，你是在把生命拆分计价。',
+        '距离下班又近了一秒。恭喜，人生余额也少了一秒。',
+        '工作使人自由——至少自由地选择什么时候去洗手间。',
+        '薪水是对劳动的肯定，到账日是对现实的提醒。',
+        '别急，老板的梦想也需要你的工时来供电。',
+        '今天也成功把灵魂租出去了，记得按时收租。',
+        '你的价值无法用金钱衡量……所以公司按月结算。',
+        '每一秒都在为未来的自己买单，别忘了给自己发工资。',
+        '人生苦短，工资却长得慢。',
+        '你不是在加班，你是在为梦想充值。',
+        '工作是生活的调味剂，工资是生活的主食。'
+      ];
+      const official = {
+        // 2026年国务院办公厅公布的节假日安排：放假日期及调休上班日期
+        holidays: ['2026-01-01', '2026-01-02', '2026-01-03', '2026-02-15', '2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22', '2026-02-23', '2026-04-04', '2026-04-05', '2026-04-06', '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05', '2026-06-19', '2026-06-20', '2026-06-21', '2026-09-25', '2026-09-26', '2026-09-27', '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07'],
+        workdays: ['2026-01-04', '2026-02-14', '2026-02-28', '2026-05-09', '2026-09-20', '2026-10-10']
+      };
+      const defaults = { salary: '15000', salaryType: 'gross', deduction: '20', actualNet: '', start: '09:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00', schedule: '5', holidayMode: 'official', manualWork: '', manualRest: '', heroFocus: 'income', privacyDefault: 'hidden', rounding: '4' };
+      function getSettings() { let s = { ...defaults }; try { const saved = JSON.parse(localStorage.getItem(STORAGE) || '{}'); s = { ...s, ...saved } } catch (e) { } return s }
+      function readForm() { const s = {};['salary', 'deduction', 'actualNet', 'start', 'end', 'lunchStart', 'lunchEnd', 'holidayMode', 'manualWork', 'manualRest', 'heroFocus', 'privacyDefault', 'rounding'].forEach(k => s[k] = $(k).value); s.salaryType = document.querySelector('input[name="salaryType"]:checked').value; s.schedule = document.querySelector('input[name="schedule"]:checked').value; return s }
+      function apply(s) { Object.keys(s).forEach(k => { const el = $(k); if (el) el.value = s[k] }); const r = document.querySelector(`input[name="salaryType"][value="${s.salaryType}"]`); if (r) r.checked = true; const sch = document.querySelector(`input[name="schedule"][value="${s.schedule}"]`); if (sch) sch.checked = true; updateDeduction() }
+      function updateDeduction() { $('deductionField').classList.toggle('hidden', document.querySelector('input[name="salaryType"]:checked').value === 'net' && !$('actualNet').value) }
+      function parseDates(str) { return new Set((str || '').split(/[,，;\s]+/).map(x => x.trim()).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x))) }
+      function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
+      function dateAt(date, time) { const [h, m] = String(time || '00:00').split(':').map(Number); const d = new Date(date); d.setHours(h || 0, m || 0, 0, 0); return d }
+      function isWorkday(date, s) { const key = fmtDate(date), dow = date.getDay(), manualRest = parseDates(s.manualRest), manualWork = parseDates(s.manualWork); if (manualRest.has(key)) return false; if (manualWork.has(key)) return true; if (s.holidayMode === 'official') { if (official.holidays.includes(key)) return false; if (official.workdays.includes(key)) return true; } return Number(s.schedule) === 7 || (Number(s.schedule) === 6 ? dow >= 1 && dow <= 6 : dow >= 1 && dow <= 5) }
+      function effectiveSecondsBetween(a, b, date, s) { if (b <= a) return 0; let secs = Math.max(0, (b - a) / 1000); const ls = dateAt(date, s.lunchStart), le = dateAt(date, s.lunchEnd); const overlap = Math.max(0, Math.min(b, le) - Math.max(a, ls)) / 1000; return Math.max(0, secs - overlap) }
+      function dailyHours(s) { const a = dateAt(new Date(2020, 0, 6), s.start), b = dateAt(new Date(2020, 0, 6), s.end); return effectiveSecondsBetween(a, b, new Date(2020, 0, 6), s) / 3600 }
+      function monthWorkdays(date, s) { let n = 0; const d = new Date(date.getFullYear(), date.getMonth(), 1); while (d.getMonth() === date.getMonth()) { if (isWorkday(d, s)) n++; d.setDate(d.getDate() + 1) } return n }
+      function monthCompletedWorkdays(now, s) { let n = 0; const d = new Date(now.getFullYear(), now.getMonth(), 1); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); while (d < today) { if (isWorkday(d, s)) n++; d.setDate(d.getDate() + 1) } return n }
+      function fmtDuration(seconds) { seconds = Math.max(0, Math.floor(seconds)); const h = Math.floor(seconds / 3600), m = Math.floor(seconds % 3600 / 60), s = seconds % 60; return `${h}小时${m}分${s}秒` }
+      let hidden = true;
+      function money(n) { const p = Number($('rounding').value || 4); return '¥ ' + Number(n || 0).toLocaleString('zh-CN', { minimumFractionDigits: p, maximumFractionDigits: p }) }
+      function toast(msg) { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 1800) }
+      function update() {
+        const s = readForm(), now = new Date(), dateKey = fmtDate(now), workday = isWorkday(now, s);
+        const gross = Math.max(0, Number(s.salary) || 0), netInput = Number(s.actualNet);
+        const net = Number.isFinite(netInput) && s.actualNet.trim() !== '' ? Math.max(0, netInput) : (s.salaryType === 'net' ? gross : gross * (1 - Math.min(80, Math.max(0, Number(s.deduction) || 0)) / 100));
+        const monthDays = monthWorkdays(now, s), hours = dailyHours(s), daily = monthDays ? net / monthDays : 0, hourly = hours ? daily / hours : 0, second = hourly / 3600;
+        const start = dateAt(now, s.start), end = dateAt(now, s.end), lunchStart = dateAt(now, s.lunchStart), lunchEnd = dateAt(now, s.lunchEnd);
+        let earnedSeconds = 0, elapsed = 0, left = 0, status = '', progress = 0;
+        if (!workday) { status = '今日无需出卖时间'; $('statusDot').style.background = 'var(--yellow)'; }
+        else if (now < start) { status = '尚未开工，灵魂暂未出租'; left = (start - now) / 1000; }
+        else if (now >= end) { status = '下班了，今天先放过自己'; earnedSeconds = effectiveSecondsBetween(start, end, now, s); elapsed = earnedSeconds; progress = 100; }
+        else { status = now >= lunchStart && now < lunchEnd ? '午休中，暂停售卖时间' : '正在营业，灵魂按秒计费'; earnedSeconds = effectiveSecondsBetween(start, now, now, s); elapsed = earnedSeconds; left = effectiveSecondsBetween(now, end, now, s); progress = hours ? Math.min(100, elapsed / (hours * 3600) * 100) : 0; }
+        const dayEarn = workday ? Math.min(hours * 3600, earnedSeconds) * second : 0;
+        const monthEarn = net * (monthCompletedWorkdays(now, s) + (workday && now >= end ? 1 : 0)) / Math.max(1, monthDays) + dayEarn - (workday && now >= end ? daily : 0);
+        $('todayDate').textContent = dateKey; $('liveIncome').textContent = money(dayEarn); $('liveIncome').classList.toggle('blurred', hidden);
+        const focusOnCountdown = s.heroFocus === 'countdown';
+        $('heroLabel').textContent = focusOnCountdown ? '距离下班' : '今日已兑现的劳动价值';
+        $('liveIncome').classList.toggle('hidden', focusOnCountdown);
+        $('heroCountdown').classList.toggle('hidden', !focusOnCountdown);
+        $('incomeCaption').textContent = focusOnCountdown
+          ? (workday ? (now >= end ? '今天的工作时间已经结束，辛苦了。' : now < start ? '倒计时结束后，今天的工时才正式开始。' : '午休时间不计入下班倒计时。') : '今天是休息日，不用赶着下班。')
+          : (workday ? `当前按税后估算时薪 ${money(hourly)} 结算；你的每一秒都有一个价格。` : '今天没有计入正常工作收益，安心做个合法的闲人。');
+        $('progressLabel').textContent = workday ? '今日有效工作进度' : '今日工作进度'; $('progressPct').textContent = `${Math.round(progress)}%`; $('progressBar').style.width = `${progress}%`;
+        $('workStatus').textContent = status; $('dailyPay').textContent = money(daily); $('hourlyPay').textContent = money(hourly); $('secondPay').textContent = money(second); $('monthPay').textContent = money(monthEarn);
+        $('workedTime').textContent = workday ? fmtDuration(elapsed) : '休息中'; $('leftTime').textContent = !workday ? '不用倒计时' : now >= end ? '已下班' : now < start ? `距上班 ${fmtDuration((start - now) / 1000)}` : fmtDuration(left); $('heroCountdown').textContent = $('leftTime').textContent;
+        $('workdayCount').textContent = `${monthDays} 天`; $('hoursToday').textContent = `${hours.toFixed(1)} 小时`;
+        document.querySelectorAll('.money,.private-value').forEach(el => el.classList.toggle('blurred', hidden));
+        $('quote').textContent = '今日寄语：' + quotes[Math.floor(now.getTime() / 60000) % quotes.length];
+        $('deductionField').classList.toggle('hidden', s.salaryType === 'net' && !s.actualNet.trim());
+      }
+      function save() { const s = readForm(); try { localStorage.setItem(STORAGE, JSON.stringify(s)); toast('设置已保存在这台设备上。工资秘密暂时安全。') } catch (e) { toast('浏览器未能保存设置，但当前计算仍可用。') } hidden = s.privacyDefault === 'hidden'; $('togglePrivacy').textContent = hidden ? '◉ 显示金额' : '◉ 隐藏金额'; update() }
+      function init() { const s = getSettings(); apply(s); hidden = s.privacyDefault === 'hidden'; $('togglePrivacy').textContent = hidden ? '◉ 显示金额' : '◉ 隐藏金额'; document.querySelectorAll('input,select').forEach(el => el.addEventListener('change', () => { updateDeduction(); update() })); $('saveBtn').addEventListener('click', save); $('refreshBtn').addEventListener('click', update); $('togglePrivacy').addEventListener('click', () => { hidden = !hidden; $('togglePrivacy').textContent = hidden ? '◉ 显示金额' : '◉ 隐藏金额'; update() }); $('resetBtn').addEventListener('click', () => { apply(defaults); try { localStorage.removeItem(STORAGE) } catch (e) { } hidden = true; $('togglePrivacy').textContent = '◉ 显示金额'; update(); toast('已恢复默认设置。工资参数重新进入迷雾。') }); update(); setInterval(update, 1000) }
+      init();
+    })();
+  </script>
+</body>
+
+</html>
